@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Project</title>
+    <style type="text/css">
+        label {
+            text-align: right;
+            width: 140px;
+            display: block;
+            float: left;
+            clear: left;
+            margin-right: 3px;
+            cursor: pointer
+        }
+        button {
+            width: 10%;
+            height: 10%;
+        }
+    </style>
+    <script
+            src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous">
+    </script>
+
+    <script>
+        $.ajax({
+            type: 'Get',
+            dataType: 'JSON',
+            url: 'https://bigeyeapp1.herokuapp.com/api/cases/',
+            success: function (data) {
+                // location.reload();
+
+                i = 0;
+                while (i < data.length){
+                    cases = data[i];
+                    $("#project_id_input").append("<option value='"+cases.CaseID+"'>"+cases.Status+" "+cases.Description+"</option>");
+                    i = i + 1;
+                }
+                $("#project_id_input").change(function(){
+                    cases = getProjectInfo($("#project_id_input").val());
+                });
+                $("#update_project_but").click(function(){
+                    updateProjectInfo($("#project_id_input").val());
+                });
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+        function getProjectInfo (project_id) {
+            $.ajax({
+                type: 'Get',
+                dataType: 'JSON',
+                url: 'https://bigeyeapp1.herokuapp.com/api/cases/'+project_id,
+                success: function (data) {
+                    // location.reload();
+                    $("#project_case").val(data.CaseID);
+                    $("#project_description").val(data.Description);
+                    $("#project_startdate").val(data.CaseDate);
+                    $("#project_fee").val(data.Fee);
+                    $("#project_type").val(data.CaseType);
+                    $("#project_notes").val(data.Notes);
+                    $('#project_status option[value= "'+data.Status+'"]').attr("selected", "selected");
+                    $("#project_client").val(data.Client);
+                    $("#project_lname").val(data.lname);
+                    $("#project_fname").val(data.fname);
+
+
+                    console.log(data);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+        function updateProjectInfo (project_id) {
+            // location.reload();
+            caseid1 =$("#project_case").val();
+            description1 =$("#project_description").val();
+            startdate1 =$("#project_startdate").val();
+            fee1 = $("#project_fee").val();
+            casetype1 =$("#project_type").val();
+            notes1 =$("#project_notes").val();
+            status1 = $("#project_status").val();
+            clientid1 =$("#project_client").val();
+            lname1 =$("#project_lname").val();
+            fname1 =$("#project_fname").val();
+
+
+
+            $.ajax({
+                type: 'Put',
+                dataType: 'JSON',
+                url: 'https://bigeyeapp1.herokuapp.com/api/cases/'+project_id+'/',
+                data: {
+                    CaseID: caseid1,
+                    Description: description1,
+                    CaseDate: startdate1,
+                    Fee: fee1,
+                    CaseType: casetype1,
+                    Status: status1,
+                    Notes: notes1,
+                    Client: clientid1,
+                    lname: lname1,
+                    fname: fname1,
+
+                },
+                success: function (data) {
+                    alert("Case updated successfully")
+                    location.reload();
+                },
+                error: function (err) {
+                    console.log(err);
+                    errors = JSON.parse(err.responseText);
+                    console.log(errors);
+                    $("#project_case_err").text(errors.CaseID);
+                    $("#project_description_err").text(errors.Description);
+                    $("#project_startdate_err").text(errors.CaseDate);
+                    $("#project_fee_err").text(errors.Fee);
+                    $("#project_type_err").text(errors.CaseType);
+                    $("#project_status_err").text(errors.Status);
+                    $("#project_client_err").text(errors.Client);
+                    $("#project_lname_err").text(errors.lname);
+                    $("#project_fname_err").text(errors.fname);
+                }
+            });
+        }
+        $(document).ready(function () {
+
+
+        });
+    </script>
+</head>
+<body>
+<form onsubmit ="return false">
+    <p><label> Open Case: </label>
+        <select id="project_id_input">
+            <option value = "">Select one</option>
+        </select>
+    </p>
+    <table>
+        <tr> <td>Case ID:</td> <td ><input id = "project_case" type = "text" size="2"><p id = "project_case_err"></p></td></tr>
+        <tr> <td>Case Description:</td> <td ><input id = "project_description" type = "text" maxlength="40" size="40"><p id = "project_description_err"></p></td></tr>
+        <tr> <td>Start Date:</td> <td ><input id = "project_startdate" type = "date" maxlength="10" size="8"><p id = "project_startdate_err"></p></td></tr>
+        <tr> <td>Fee:</td> <td ><input id = "project_fee" type = "number" size="3"><p id = "project_fee_err"></p></td></tr>
+        <tr> <td>Case Type:</td> <td ><input id = "project_type" type = "text" maxlength="30" size="30"><p id = "project_type_err"></p></td></tr>
+        <tr> <td>Status:</td> <td ><select id = "project_status">
+            <option value = "Open">
+                Open
+            </option>
+            <option value = "Closed">
+                Closed
+            </option>
+            <p id = "project_status_err"></p>
+        </select></td></tr>
+        <tr> <td>Notes:</td> <td ><input id = "project_notes" type = "text" maxlength="100" size="100"></td></tr>
+        <tr> <td>Client ID:</td> <td ><input id = "project_client" type = "text" size="2"><p id = "project_client_err"></p></td></tr>
+        <tr> <td>Last Name:</td> <td ><input id = "project_lname" type = "text" maxlength="25" size="25"><p id = "project_lname_err"></p></td></tr>
+        <tr> <td>First Name:</td> <td ><input id = "project_fname" type = "text" maxlength="25" size="25"><p id = "project_fname_err"></p></td></tr>
+
+    </table>
+    </p> <button onclick="myFunction()" type="button" id="update_project_but">Update Case</button>
+    <a href="MainMenu.html">Return</a>
+</form>
+</body>
+</html>
