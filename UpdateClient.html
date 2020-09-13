@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Update Investigator</title>
+    <title>Update Client</title>
     <style type="text/css">
         label {
             text-align: right;
@@ -28,18 +28,18 @@
         $.ajax({
             type: 'Get',
             dataType: 'JSON',
-            url: 'https://bigeyeapp1.herokuapp.com/api/investigators/',
+            url: 'https://bigeyeapp1.herokuapp.com/api/clients/',
             success: function (data) {
                 // location.reload();
 
                 i = 0;
                 while (i < data.length){
-                    investigators = data[i];
-                    $("#project_id_input").append("<option value='"+investigators.InvestigatorID+"'>"+investigators.FirstName+" "+investigators.LastName+"</option>");
+                    clients = data[i];
+                    $("#project_id_input").append("<option value='"+clients.ClientID+"'>"+clients.ClientID+" "+clients.LastName+"</option>");
                     i = i + 1;
                 }
                 $("#project_id_input").change(function(){
-                    investigators = getProjectInfo($("#project_id_input").val());
+                    clients = getProjectInfo($("#project_id_input").val());
                 });
                 $("#update_project_but").click(function(){
                     updateProjectInfo($("#project_id_input").val());
@@ -49,20 +49,22 @@
                 console.log(err);
             }
         });
-        function getProjectInfo (investigators) {
+        function getProjectInfo (ClientID) {
             $.ajax({
                 type: 'Get',
                 dataType: 'JSON',
-                url: 'https://bigeyeapp1.herokuapp.com/api/investigators/'+investigators,
+                url: 'https://bigeyeapp1.herokuapp.com/api/clients/'+ClientID,
                 success: function (data) {
                     // location.reload();
-                    $("#project_investigatorID").val(data.InvestigatorID);
-                    $("#project_fname").val(data.FirstName);
+                    $("#project_client").val(data.ClientID);
                     $("#project_lname").val(data.LastName);
+                    $("#project_fname").val(data.FirstName);
                     $("#project_streetaddress").val(data.StreetAddress);
                     $("#project_suburb").val(data.Suburb);
+                    $("#project_city").val(data.City);
                     $("#project_phonenumber").val(data.PhoneNumbrer);
-                    $("#project_hourlyrate").val(data.HourlyRate);
+                    $("#project_email").val(data.EmailAddress);
+                    $('#project_status option[value= "'+data.Status+'"]').attr("selected", "selected");
 
 
                     console.log(data);
@@ -72,46 +74,51 @@
                 }
             });
         }
-        function updateProjectInfo (investigators) {
+        function updateProjectInfo (ClientID) {
             // location.reload();
-            investigatorsid1 = $("#project_investigatorID").val();
-            fnameid1 =$("#project_fname").val();
+            clientid1 =$("#project_client").val();
             lnameid1 =$("#project_lname").val();
+            fnameid1 =$("#project_fname").val();
             streetaddressid1 = $("#project_streetaddress").val();
             suburbid1 =$("#project_suburb").val();
-            phonenumberid1 =$("#project_phonenumber").val();
-            hourlyrateid1 = $("#project_hourlyrate").val();
+            cityid1 =$("#project_city").val();
+            phonenumberid1 = $("#project_phonenumber").val();
+            emailid1 =$("#project_email").val();
+            statusid1 =$("#project_status").val();
 
 
 
             $.ajax({
                 type: 'Put',
                 dataType: 'JSON',
-                url: 'https://bigeyeapp1.herokuapp.com/api/investigators/'+investigators+'/',
+                url: 'https://bigeyeapp1.herokuapp.com/api/clients/'+clients+'/',
                 data: {
-                    InvestigatorID: investigatorsid1,
-                    FirstName: fnameid1,
+                    ClientID: clientid1,
                     LastName: lnameid1,
+                    FirstName: fnameid1,
                     StreetAddress: streetaddressid1,
                     Suburb: suburbid1,
+                    City: cityid1,
                     PhoneNumbrer: phonenumberid1,
-                    HourlyRate: hourlyrateid1,
+                    EmailAddress: emailid1,
+                    ClientStatus: statusid1
+
                 },
                 success: function (data) {
-                    alert("Case updated successfully")
+                    alert("Client updated successfully")
                     location.reload();
                 },
                 error: function (err) {
                     console.log(err);
                     errors = JSON.parse(err.responseText);
                     console.log(errors);
-                    $("#project_investigatorID_err").text(errors.InvestigatorID);
-                    $("#project_fname_err").text(errors.FirstName);
+                    $("#project_client_err").text(errors.ClientID);
                     $("#project_lname_err").text(errors.LastName);
+                    $("#project_fname_err").text(errors.FirstName);
                     $("#project_streetaddress_err").text(errors.StreetAddress);
                     $("#project_suburb_err").text(errors.Suburb);
-                    $("#project_phonenumber_err").text(errors.PhoneNumbrer);
-                    $("#project_hourlyrate_err").text(errors.HourlyRate);
+                    $("#project_city_err").text(errors.City);
+                    $("#project_status_err").text(errors.ClientStatus);
                 }
             });
         }
@@ -121,25 +128,35 @@
         });
     </script>
 </head>
-<header><h1>Update Investigator</h1></header>
+<header><h1>Update Client</h1></header>
 <body>
 <form onsubmit ="return false">
-    <p><label> Investigators: </label>
+    <p><label> Client ID: </label>
         <select id="project_id_input">
             <option value = "">Select one</option>
         </select>
     </p>
     <table>
-        <tr> <td>Investigator ID:</td> <td ><input id = "project_investigatorID" type = "text" size="2"><p id = "project_investigatorID_err"></p></td></tr>
-        <tr> <td>First Name:</td> <td ><input id = "project_fname" type = "text" maxlength="30" size="30"><p id = "project_fname_err"></p></td></tr>
-        <tr> <td>Last Name:</td> <td ><input id = "project_lname" type = "text" maxlength="30" size="30"><p id = "project_lname_err"></p></td></tr>
-        <tr> <td>Street Address:</td> <td ><input id = "project_streetaddress" type = "text" maxlength="50" size="50"><p id = "project_streetaddress_err"></p></td></tr>
+        <tr> <td>Client ID:</td> <td ><input id = "project_client" type = "text" maxlength="25" size="25"><p id = "project_client_err"></p></td></tr>
+        <tr> <td>Last Name:</td> <td ><input id = "project_lname" type = "text" maxlength="25" size="25"><p id = "project_lname_err"></p></td></tr>
+        <tr> <td>First Name:</td> <td ><input id = "project_fname" type = "text" maxlength="25" size="25"><p id = "project_fname_err"></p></td></tr>
+        <tr> <td>StreetAddress:</td> <td ><input id = "project_streetaddress" type = "text" maxlength="50" size="50"><p id = "project_streetaddress_err"></p></td></tr>
         <tr> <td>Suburb:</td> <td ><input id = "project_suburb" type = "text" maxlength="20" size="20"><p id = "project_suburb_err"></p></td></tr>
-        <tr> <td>Phone Number:</td> <td ><input id = "project_phonenumber" type = "text" maxlength="16" size="16"><p id="project_phonenumber_err"></p></td></tr>
-        <tr> <td>Hourly Rate:</td> <td ><input id = "project_hourlyrate" type = "number" size="5"><p id = "project_hourlyrate_err"></p></td></tr>
+        <tr> <td>City:</td> <td ><input id = "project_city" type = "text" maxlength="25" size="25"><p id = "project_city_err"></p></td></tr>
+        <tr> <td>Credit Status:</td> <td ><select id = "project_status">
+            <option value = "Open">
+                Invaild
+            </option>
+            <option value = "Closed">
+                Vaild
+            </option>
+            <p id = "project_status_err"></p>
+        </select></td></tr>
+        <tr> <td>Phone Number:</td> <td ><input id = "project_phonenumber" type = "text" maxlength="16" size="16"></td></tr>
+        <tr> <td>EmailAddress:</td> <td ><input id = "project_email" type = "text" maxlength="30" size="30"></td></tr>
 
     </table>
-    </p> <button onclick="myFunction()" type="button" id="update_project_but">Update Case</button>
+    </p> <button onclick="myFunction()" type="button" id="update_project_but">Update Client</button>
     <a href="MainMenu.html">Return</a>
 </form>
 </body>
